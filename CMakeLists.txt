@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(cpp_template)
+project(Chip8)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)

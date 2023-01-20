@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(cpp_template)
+project(Chip8)
 
 # Global settings.
 set(CMAKE_CXX_STANDARD 20)
@@ -7,10 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Wall -Wextra -pedantic)
 
 # Library.
-set(LIB_NAME lib${CMAKE_PROJECT_NAME})
+set(LIB_NAME ${CMAKE_PROJECT_NAME}Core)
 
 set(LIB_SRC_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/hello.cpp
+    chip8.cpp
+    game.cpp
+    sdl.cpp
 )
 
 add_library(${LIB_NAME}
@@ -22,15 +24,14 @@ target_include_directories(${LIB_NAME}
 )
 
 target_link_libraries(${LIB_NAME}
-    # Core functionality CONAN_PKGs here, eg:
-    # CONAN_PKG::boost
+    CONAN_PKG::sdl
 )
 
 # Executable. Won't be accessible for testing.
 set(EXE_NAME ${CMAKE_PROJECT_NAME})
 
 set(EXE_SRC_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    main.cpp
 )
 
 add_executable(${EXE_NAME}
@@ -39,6 +40,5 @@ add_executable(${EXE_NAME}
 
 target_link_libraries(${EXE_NAME}
     ${LIB_NAME}
-    # Executable-related CONAN_PKGs here, eg:
-    # CONAN_PKG::cli11
+    CONAN_PKG::cli11
 )

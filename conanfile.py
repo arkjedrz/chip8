@@ -1,11 +1,11 @@
 from conans import ConanFile
 
 
-class cpp_templateConan(ConanFile):
+class Chip8Conan(ConanFile):
     """
-    Dependencies for cpp_template app.
+    Dependencies for Chip8 app.
     """
-    name = "cpp_template"
+    name = "Chip8"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
     options = {
@@ -16,5 +16,10 @@ class cpp_templateConan(ConanFile):
     }
 
     def requirements(self):
+        self.requires('cli11/2.2.0')
+        self.requires('sdl/2.0.20')
         if self.options.testing:
             self.requires('gtest/1.11.0')
+
+    def configure(self):
+        self.options['sdl'].wayland = False

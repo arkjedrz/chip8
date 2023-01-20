@@ -1,19 +1,19 @@
 cmake_minimum_required(VERSION 3.22)
-project(cpp_templateTests)
+project(Chip8Tests)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Wall -Wextra -pedantic)
 
 set(SRC_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_hello.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_opcodes.cpp
 )
 
-add_executable(cpp_templateTests
+add_executable(Chip8Tests
     ${SRC_FILES}
 )
 
-target_link_libraries(cpp_templateTests
-    libcpp_template
+target_link_libraries(Chip8Tests
+    Chip8Core
     CONAN_PKG::gtest
 )

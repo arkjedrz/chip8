@@ -1,11 +1,8 @@
-# cpp_template
+# Chip8
 
-CMake/Conan-based template for C++ projects.
-Tailored for personal usage.
+Basic Chip8 emulator written in C++.
 
 ## Usage
-
-Replace cpp_template with project name and remove redundant example files.
 
 Quick start:
 
@@ -14,7 +11,7 @@ mkdir build && cd build
 conan install .. --build=missing -o testing=True
 cmake -D TESTING=ON ..
 cmake --build .
-./bin/cpp_template
+./bin/Chip8
 ```
 
 ## Tested configurations
