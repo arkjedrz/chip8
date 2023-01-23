@@ -251,8 +251,10 @@ void Chip8::execute_cycle() {
         // SHR Vx,[Vy]
         case 0x0006: {
           auto reg_x{(opcode & 0x0F00) >> 8};
-          auto lsb{registers_[reg_x] & 0b00000001};
-          registers_[reg_x] = registers_[reg_x] >> 1;
+          auto reg_y{(opcode & 0x00F0) >> 4};
+
+          auto lsb{registers_[reg_y] & 0b00000001};
+          registers_[reg_x] = registers_[reg_y] >> 1;
           registers_[0xF] = lsb;
 
           pc_ += 2;
@@ -276,8 +278,10 @@ void Chip8::execute_cycle() {
         // SHL Vx,[Vy]
         case 0x000E: {
           auto reg_x{(opcode & 0x0F00) >> 8};
-          auto msb{registers_[reg_x] & 0b10000000};
-          registers_[reg_x] = registers_[reg_x] << 1;
+          auto reg_y{(opcode & 0x00F0) >> 4};
+
+          auto msb{registers_[reg_y] & 0b10000000};
+          registers_[reg_x] = registers_[reg_y] << 1;
           registers_[0xF] = msb > 0 ? 1 : 0;
 
           pc_ += 2;
@@ -443,7 +447,8 @@ void Chip8::execute_cycle() {
         case 0x0055: {
           auto reg_x{(opcode & 0x0F00) >> 8};
           for (int i = 0; i <= reg_x; ++i) {
-            ram_[ir_ + i] = registers_[i];
+            ram_[ir_] = registers_[i];
+            ir_ += 1;
           }
 
           pc_ += 2;
@@ -453,7 +458,8 @@ void Chip8::execute_cycle() {
         case 0x0065: {
           auto reg_x{(opcode & 0x0F00) >> 8};
           for (int i = 0; i <= reg_x; ++i) {
-            registers_[i] = ram_[ir_ + i];
+            registers_[i] = ram_[ir_];
+            ir_ += 1;
           }
 
           pc_ += 2;
