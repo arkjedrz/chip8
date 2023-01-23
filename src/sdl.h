@@ -21,7 +21,6 @@ class Input {
 
 class MockedInput : public Input {
  public:
-  MockedInput(std::array<bool, 16> state);
   ~MockedInput() = default;
 
   std::array<bool, 16> key_state() override;

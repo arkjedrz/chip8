@@ -349,20 +349,22 @@ void Chip8::execute_cycle() {
     }
     // SKP and SKNP
     case 0xE000: {
-      auto value{(opcode & 0x0F00) >> 8};
-
+      auto reg_x{(opcode & 0x0F00) >> 8};
       switch (opcode & 0x00FF) {
         case 0x009E: {
-          if (key_state.at(value)) {
+          if (key_state.at(registers_[reg_x])) {
             pc_ += 2;
           }
           break;
         }
         case 0x00A1: {
-          if (!key_state.at(value)) {
+          if (!key_state.at(registers_[reg_x])) {
             pc_ += 2;
           }
           break;
+        }
+        default: {
+          throw std::runtime_error("Unknown opcode.");
         }
       }
 
@@ -426,7 +428,7 @@ void Chip8::execute_cycle() {
 
           ram_[ir_] = registers_[reg_x] / 100;
           ram_[ir_ + 1] = (registers_[reg_x] / 10) % 10;
-          ram_[ir_ + 2] = (registers_[reg_x] / 100) % 10;
+          ram_[ir_ + 2] = (registers_[reg_x] % 100) % 10;
 
           pc_ += 2;
           break;

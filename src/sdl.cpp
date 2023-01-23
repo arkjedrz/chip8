@@ -5,8 +5,6 @@
 #include <iostream>
 #include <string>
 
-MockedInput::MockedInput(std::array<bool, 16> state) : state_{state} {}
-
 std::array<bool, 16> MockedInput::key_state() { return state_; }
 
 bool MockedInput::emulator_active() const { return true; }

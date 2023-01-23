@@ -5,7 +5,7 @@
 
 class OpCodeTest : public ::testing::Test {
  public:
-  OpCodeTest() : gfx{}, in{std::array<bool, 16>{}}, c{Chip8{&gfx, &in}} {}
+  OpCodeTest() : gfx{}, in{}, c{Chip8{&gfx, &in}} {}
 
  protected:
   EmptyGfx gfx;
@@ -155,36 +155,137 @@ TEST_F(OpCodeTest, LDVxVy_8xy0) {
   ASSERT_EQ(c.registers(0x5), 0xAB);
 }
 
-TEST_F(OpCodeTest, DISABLED_ORVxVy_8xy1) {
-  // TODO
+TEST_F(OpCodeTest, ORVxVy_8xy1) {
+  // LD Vx,NN then LD Vy,NN then OR Vx,Vy
+  c.load({0x6D, 0xAB, 0x63, 0xCD, 0x8D, 0x31});
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0xD), 0xAB);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x204);
+  ASSERT_EQ(c.registers(0x3), 0xCD);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x206);
+  ASSERT_EQ(c.registers(0xD), 0xAB | 0xCD);
 }
 
-TEST_F(OpCodeTest, DISABLED_ANDVxVy_8xy2) {
-  // TODO
+TEST_F(OpCodeTest, ANDVxVy_8xy2) {
+  // LD Vx,NN then LD Vy,NN then AND Vx,Vy
+  c.load({0x6D, 0xAB, 0x63, 0xCD, 0x8D, 0x32});
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0xD), 0xAB);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x204);
+  ASSERT_EQ(c.registers(0x3), 0xCD);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x206);
+  ASSERT_EQ(c.registers(0xD), 0xAB & 0xCD);
 }
 
-TEST_F(OpCodeTest, DISABLED_XORVxVy_8xy3) {
-  // TODO
+TEST_F(OpCodeTest, XORVxVy_8xy3) {
+  // LD Vx,NN then LD Vy,NN then XOR Vx,Vy
+  c.load({0x6D, 0xAB, 0x63, 0xCD, 0x8D, 0x33});
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0xD), 0xAB);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x204);
+  ASSERT_EQ(c.registers(0x3), 0xCD);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x206);
+  ASSERT_EQ(c.registers(0xD), 0xAB ^ 0xCD);
 }
 
-TEST_F(OpCodeTest, DISABLED_ADDVxVy_8xy4) {
-  // TODO
+TEST_F(OpCodeTest, ADDVxVy_8xy4) {
+  // LD Vx,NN then LD Vy,NN then ADD Vx,Vy
+  c.load({0x6D, 0xDD, 0x63, 0xFE, 0x8D, 0x34});
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0xD), 0xDD);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x204);
+  ASSERT_EQ(c.registers(0x3), 0xFE);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x206);
+  ASSERT_EQ(c.registers(0xD), static_cast<uint8_t>(0xDD + 0xFE));
+  ASSERT_EQ(c.registers(0xF), 1);
 }
 
-TEST_F(OpCodeTest, DISABLED_SUBVxVy_8xy5) {
-  // TODO
+TEST_F(OpCodeTest, SUBVxVy_8xy5) {
+  // LD Vx,NN then LD Vy,NN then SUB Vx,Vy
+  c.load({0x6D, 0xDD, 0x63, 0xFE, 0x8D, 0x35});
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0xD), 0xDD);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x204);
+  ASSERT_EQ(c.registers(0x3), 0xFE);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x206);
+  ASSERT_EQ(c.registers(0xD), static_cast<uint8_t>(0xDD - 0xFE));
+  ASSERT_EQ(c.registers(0xF), 0);
 }
 
-TEST_F(OpCodeTest, DISABLED_SHRVxVy_8xy6) {
-  // TODO
+TEST_F(OpCodeTest, SHRVxVy_8xy6) {
+  // LD Vx,NN then SHR Vx,[Vy]
+  c.load({0x6D, 0xFB, 0x8D, 0x06});
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0xD), 0xFB);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x204);
+  ASSERT_EQ(c.registers(0xD), 0xFB >> 1);
+  ASSERT_EQ(c.registers(0xF), 1);
 }
 
-TEST_F(OpCodeTest, DISABLED_SUBNVxVy_8xy7) {
-  // TODO
+TEST_F(OpCodeTest, SUBNVxVy_8xy7) {
+  // LD Vx,NN then LD Vy,NN then SUBN Vx,Vy
+  c.load({0x6D, 0xDD, 0x63, 0xFE, 0x8D, 0x37});
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0xD), 0xDD);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x204);
+  ASSERT_EQ(c.registers(0x3), 0xFE);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x206);
+  ASSERT_EQ(c.registers(0xD), static_cast<uint8_t>(0xFE - 0xDD));
+  ASSERT_EQ(c.registers(0xF), 1);
 }
 
-TEST_F(OpCodeTest, DISABLED_SHLVxVy_8xyE) {
-  // TODO
+TEST_F(OpCodeTest, SHLVxVy_8xyE) {
+  // LD Vx,NN then SHL Vx,[Vy]
+  c.load({0x6D, 0xCB, 0x8D, 0x0E});
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0xD), 0xCB);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x204);
+  ASSERT_EQ(c.registers(0xD), static_cast<uint8_t>(0xCB << 1));
+  ASSERT_EQ(c.registers(0xF), 1);
 }
 
 TEST_F(OpCodeTest, SNEVxVy_9xy0) {
@@ -246,24 +347,52 @@ TEST_F(OpCodeTest, DISABLED_DRWVxVyn_Dxyn) {
 }
 
 TEST_F(OpCodeTest, SKP_Ex9E) {
-  // Key not pressed, then pressed.
+  // LD Vx, NN then SKP Vx
+  // Key pressed.
   in.set_key_state(0xA, true);
-  c.load({0xE0, 0x9E, 0xEA, 0x9E});
+  c.load({0x65, 0x0A, 0xE5, 0x9E});
 
   c.execute_cycle();
   ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0x5), 0x0A);
 
   c.execute_cycle();
   ASSERT_EQ(c.program_counter(), 0x206);
-}
 
-TEST_F(OpCodeTest, SKPN_ExA1) {
-  // Key pressed, then not pressed.
-  in.set_key_state(0xA, true);
-  c.load({0xEA, 0xA1, 0xE0, 0xA1});
+  // Key not pressed.
+  in.set_key_state(0xA, false);
+  c.reset();
+  c.load({0x65, 0x0A, 0xE5, 0x9E});
 
   c.execute_cycle();
   ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0x5), 0x0A);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x204);
+}
+
+TEST_F(OpCodeTest, SKPN_ExA1) {
+  // LD Vx, NN then SKP Vx
+  // Key pressed.
+  in.set_key_state(0xA, true);
+  c.load({0x65, 0x0A, 0xE5, 0xA1});
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0x5), 0x0A);
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x204);
+
+  // Key not pressed.
+  in.set_key_state(0xA, false);
+  c.reset();
+  c.load({0x65, 0x0A, 0xE5, 0xA1});
+
+  c.execute_cycle();
+  ASSERT_EQ(c.program_counter(), 0x202);
+  ASSERT_EQ(c.registers(0x5), 0x0A);
 
   c.execute_cycle();
   ASSERT_EQ(c.program_counter(), 0x206);
@@ -296,9 +425,10 @@ TEST_F(OpCodeTest, LDVxK_Fx0A) {
   ASSERT_EQ(c.program_counter(), 0x200);
 
   in.set_key_state(0xD, true);
+  in.set_key_state(0xA, true);
   c.execute_cycle();
   ASSERT_EQ(c.program_counter(), 0x202);
-  ASSERT_EQ(c.registers(0xC), 0xD);
+  ASSERT_EQ(c.registers(0xC), 0xA);
 }
 
 TEST_F(OpCodeTest, LDDTVx_Fx15) {
