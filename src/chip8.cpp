@@ -467,17 +467,15 @@ void Chip8::execute_cycle() {
   }
 
   gfx_->render();
+}
 
-  // Timers.
-  // TODO: this should be done via external clock.
+void Chip8::update_timers() {
   if (dt_ > 0) {
     --dt_;
   }
   if (st_ > 0) {
     --st_;
   }
-
-  // print_status(opcode);
 }
 
 void Chip8::print_status(uint16_t current_opcode) const {

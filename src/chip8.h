@@ -23,7 +23,11 @@ class Chip8 {
 
   void load(const std::vector<uint8_t>& game);
 
+  // Run one CPU cycle.
   void execute_cycle();
+
+  // Update timers. Should be invoked by independent clock.
+  void update_timers();
 
  private:
   Gfx* const gfx_;

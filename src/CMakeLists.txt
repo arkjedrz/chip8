@@ -13,6 +13,7 @@ set(LIB_SRC_FILES
     chip8.cpp
     game.cpp
     sdl.cpp
+    timer.cpp
 )
 
 add_library(${LIB_NAME}
