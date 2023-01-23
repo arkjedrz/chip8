@@ -33,7 +33,7 @@ class Chip8 {
   Gfx* const gfx_;
   Input* const input_;
 
-  uint8_t ram_[4096];
+  uint8_t ram_[0x2000];
   uint8_t registers_[16];
   uint8_t dt_;
   uint8_t st_;

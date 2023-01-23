@@ -39,7 +39,7 @@ T random(T range_from, T range_to) {
 Chip8::Chip8(Gfx* const gfx, Input* const input) : gfx_{gfx}, input_{input} { reset(); }
 
 uint8_t Chip8::ram(uint16_t index) const {
-  if (index > 0xFFF) {
+  if (index > 0x2000 - 1) {
     throw std::out_of_range("Out of bounds access.");
   }
   return ram_[index];
@@ -70,7 +70,7 @@ uint16_t Chip8::stack(uint8_t index) const {
 }
 
 void Chip8::reset() {
-  std::fill(ram_, ram_ + 4096, 0);
+  std::fill(ram_, ram_ + 0x2000, 0);
   std::fill(registers_, registers_ + 0xF, 0);
   dt_ = 0;
   st_ = 0;
@@ -196,6 +196,7 @@ void Chip8::execute_cycle() {
           auto reg_x{(opcode & 0x0F00) >> 8};
           auto reg_y{(opcode & 0x00F0) >> 4};
           registers_[reg_x] |= registers_[reg_y];
+          registers_[0xF] = 0;
           pc_ += 2;
 
           break;
@@ -205,6 +206,7 @@ void Chip8::execute_cycle() {
           auto reg_x{(opcode & 0x0F00) >> 8};
           auto reg_y{(opcode & 0x00F0) >> 4};
           registers_[reg_x] &= registers_[reg_y];
+          registers_[0xF] = 0;
           pc_ += 2;
 
           break;
@@ -214,6 +216,7 @@ void Chip8::execute_cycle() {
           auto reg_x{(opcode & 0x0F00) >> 8};
           auto reg_y{(opcode & 0x00F0) >> 4};
           registers_[reg_x] ^= registers_[reg_y];
+          registers_[0xF] = 0;
           pc_ += 2;
 
           break;
@@ -224,8 +227,8 @@ void Chip8::execute_cycle() {
           auto reg_y{(opcode & 0x00F0) >> 4};
           auto res{registers_[reg_x] + registers_[reg_y]};
 
-          registers_[0xF] = res > 255 ? 1 : 0;
           registers_[reg_x] = res;
+          registers_[0xF] = res > 255 ? 1 : 0;
 
           pc_ += 2;
 
@@ -237,8 +240,9 @@ void Chip8::execute_cycle() {
           auto reg_y{(opcode & 0x00F0) >> 4};
           auto res{registers_[reg_x] - registers_[reg_y]};
 
-          registers_[0xF] = registers_[reg_x] > registers_[reg_y] ? 1 : 0;
+          auto cmp{registers_[reg_x] > registers_[reg_y]};
           registers_[reg_x] = res;
+          registers_[0xF] = cmp ? 1 : 0;
 
           pc_ += 2;
 
@@ -247,8 +251,9 @@ void Chip8::execute_cycle() {
         // SHR Vx,[Vy]
         case 0x0006: {
           auto reg_x{(opcode & 0x0F00) >> 8};
-          registers_[0xF] = registers_[reg_x] % 2 == 1 ? 1 : 0;
+          auto lsb{registers_[reg_x] & 0b00000001};
           registers_[reg_x] = registers_[reg_x] >> 1;
+          registers_[0xF] = lsb;
 
           pc_ += 2;
 
@@ -260,8 +265,9 @@ void Chip8::execute_cycle() {
           auto reg_y{(opcode & 0x00F0) >> 4};
           auto res{registers_[reg_y] - registers_[reg_x]};
 
-          registers_[0xF] = registers_[reg_y] > registers_[reg_x] ? 1 : 0;
+          auto cmp{registers_[reg_y] > registers_[reg_x]};
           registers_[reg_x] = res;
+          registers_[0xF] = cmp ? 1 : 0;
 
           pc_ += 2;
 
@@ -271,8 +277,8 @@ void Chip8::execute_cycle() {
         case 0x000E: {
           auto reg_x{(opcode & 0x0F00) >> 8};
           auto msb{registers_[reg_x] & 0b10000000};
-          registers_[0xF] = msb > 0 ? 1 : 0;
           registers_[reg_x] = registers_[reg_x] << 1;
+          registers_[0xF] = msb > 0 ? 1 : 0;
 
           pc_ += 2;
           break;
