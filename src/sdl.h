@@ -2,6 +2,7 @@
 
 #include <SDL2/SDL.h>
 
+#include <condition_variable>
 #include <memory>
 
 class Input {
@@ -14,9 +15,6 @@ class Input {
   // 7 8 9 E
   // A 0 B F
   virtual std::array<bool, 16> key_state() = 0;
-
-  // False, when SDL_QUIT detected.
-  virtual bool emulator_active() const = 0;
 };
 
 class MockedInput : public Input {
@@ -24,7 +22,6 @@ class MockedInput : public Input {
   ~MockedInput() = default;
 
   std::array<bool, 16> key_state() override;
-  bool emulator_active() const override;
 
   void set_key_state(int key, bool state);
 
@@ -37,10 +34,13 @@ class SdlInput : public Input {
   ~SdlInput() = default;
 
   std::array<bool, 16> key_state() override;
-  bool emulator_active() const override;
+
+  bool emulator_active() const;
+  std::condition_variable& emulator_active_cv();
 
  private:
   bool emulator_active_{true};
+  std::condition_variable cv_;
 };
 
 class Gfx {

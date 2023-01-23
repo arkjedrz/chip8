@@ -7,8 +7,6 @@
 
 std::array<bool, 16> MockedInput::key_state() { return state_; }
 
-bool MockedInput::emulator_active() const { return true; }
-
 void MockedInput::set_key_state(int key, bool state) { state_[key] = state; }
 
 std::array<bool, 16> SdlInput::key_state() {
@@ -16,6 +14,7 @@ std::array<bool, 16> SdlInput::key_state() {
   while (SDL_PollEvent(&e) != 0) {
     if (e.type == SDL_QUIT) {
       emulator_active_ = false;
+      cv_.notify_all();
     }
   }
 
@@ -81,6 +80,8 @@ std::array<bool, 16> SdlInput::key_state() {
 }
 
 bool SdlInput::emulator_active() const { return emulator_active_; }
+
+std::condition_variable& SdlInput::emulator_active_cv() { return cv_; }
 
 Gfx::Gfx() { map_ = std::make_unique<bool[]>(chip8_height_ * chip8_width_); }
 
