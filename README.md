@@ -17,3 +17,14 @@ cmake --build .
 ## Tested configurations
 
 - Ubuntu 22.04
+
+## TODOs
+
+- Add sound
+- Fix all Chip-8 quirks from test suite
+
+## Acknowlegments
+
+- [Cowgod's Chip-8 Technical Reference](devernay.free.fr/hacks/chip8/)
+- [cookerlyk/Chip8](https://github.com/cookerlyk/Chip8)
+- [Timendus/chip8-test-suite](https://github.com/Timendus/chip8-test-suite)
