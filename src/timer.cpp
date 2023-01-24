@@ -1,7 +1,7 @@
 #include "timer.h"
 
 Timer::Timer(Interval interval, Callback callback)
-    : interval_{interval}, callback_{callback}, running_{true}, thread_{[&]() {
+    : interval_{interval}, callback_{std::move(callback)}, running_{true}, thread_{[&]() {
         auto prev_time{std::chrono::system_clock::now()};
         while (running_) {
           auto until_time{prev_time + interval_};

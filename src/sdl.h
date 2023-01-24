@@ -61,9 +61,9 @@ class Gfx {
   virtual void render() = 0;
 
  protected:
-  const int chip8_width_{64};
-  const int chip8_height_{32};
-  std::unique_ptr<bool[]> map_;
+  static const int chip8_width{64};
+  static const int chip8_height{32};
+  std::array<bool, chip8_width * chip8_height> map_;
 };
 
 class EmptyGfx : public Gfx {

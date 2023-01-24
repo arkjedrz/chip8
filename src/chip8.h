@@ -19,8 +19,6 @@ class Chip8 {
   uint8_t stack_pointer() const;
   uint16_t stack(uint8_t index) const;
 
-  void reset();
-
   void load(const std::vector<uint8_t>& game);
 
   // Run one CPU cycle.
@@ -30,17 +28,17 @@ class Chip8 {
   void update_timers();
 
  private:
-  Gfx* const gfx_;
-  Input* const input_;
+  Gfx* gfx_;
+  Input* input_;
 
-  uint8_t ram_[0x2000];
-  uint8_t registers_[16];
+  std::array<uint8_t, 0x1000> ram_;
+  std::array<uint8_t, 16> registers_;
   uint8_t dt_;
   uint8_t st_;
   uint16_t ir_;
   uint16_t pc_;
   uint8_t sp_;
-  uint16_t stack_[16];
+  std::array<uint16_t, 16> stack_;
 
   void print_status(uint16_t current_opcode) const;
 };
