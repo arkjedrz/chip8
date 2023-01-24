@@ -8,7 +8,7 @@
 
 class Chip8 {
  public:
-  Chip8(Gfx* const gfx, Input* const input);
+  Chip8(Gfx* const gfx, Input* const input, Audio* const audio);
 
   uint8_t ram(uint16_t index) const;
   uint8_t registers(uint8_t index) const;
@@ -30,6 +30,7 @@ class Chip8 {
  private:
   Gfx* gfx_;
   Input* input_;
+  Audio* audio_;
 
   std::array<uint8_t, 0x1000> ram_;
   std::array<uint8_t, 16> registers_;

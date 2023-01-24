@@ -84,3 +84,31 @@ class SdlGfx : public Gfx {
   SDL_Window* window_{};
   SDL_Surface* surface_{};
 };
+
+class Audio {
+ public:
+  virtual ~Audio() = default;
+
+  virtual void play() = 0;
+  virtual void stop() = 0;
+};
+
+class EmptyAudio : public Audio {
+ public:
+  void play() override {}
+  void stop() override {}
+};
+
+class SdlAudio : public Audio {
+ public:
+  SdlAudio();
+  ~SdlAudio() override;
+
+  void play() override;
+  void stop() override;
+
+ private:
+  SDL_AudioDeviceID device_{};
+  SDL_AudioSpec spec_{};
+  std::unique_ptr<int16_t[]> sample_{};
+};

@@ -153,3 +153,36 @@ void SdlGfx::render() {
 
   SDL_UpdateWindowSurface(window_);
 }
+
+SdlAudio::SdlAudio() {
+  SDL_Init(SDL_INIT_AUDIO);
+
+  spec_.freq = 44100;
+  spec_.format = AUDIO_S16SYS;
+  spec_.channels = 1;
+  spec_.samples = 1024;
+  spec_.callback = nullptr;
+
+  device_ = SDL_OpenAudioDevice(nullptr, 0, &spec_, nullptr, 0);
+
+  // Prepare 1 second sample.
+  sample_ = std::make_unique<int16_t[]>(spec_.freq);
+  float x = 0.0f;
+  for (int i = 0; i < spec_.freq; ++i) {
+    x += .01f;
+    sample_[i] = sin(x * 4) * 5000;
+  }
+
+  // Load sample to device.
+  const auto sample_size{spec_.freq * sizeof(int16_t)};
+  SDL_QueueAudio(device_, sample_.get(), sample_size);
+}
+
+SdlAudio::~SdlAudio() {
+  SDL_CloseAudioDevice(device_);
+  SDL_QuitSubSystem(SDL_INIT_AUDIO);
+}
+
+void SdlAudio::play() { SDL_PauseAudioDevice(device_, 0); }
+
+void SdlAudio::stop() { SDL_PauseAudioDevice(device_, 1); }

@@ -17,7 +17,8 @@ int main(int argc, char** argv) {
 
   auto gfx{std::make_unique<SdlGfx>(1024, 512)};
   auto input{std::make_unique<SdlInput>()};
-  Chip8 chip8{gfx.get(), input.get()};
+  auto audio{std::make_unique<SdlAudio>()};
+  Chip8 chip8{gfx.get(), input.get(), audio.get()};
   chip8.load(game);
 
   Timer timer_clock{std::chrono::milliseconds(1000 / 60), [&chip8]() { chip8.update_timers(); }};

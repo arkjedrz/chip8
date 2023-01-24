@@ -20,7 +20,6 @@ cmake --build .
 
 ## TODOs
 
-- Add sound
 - Fix all Chip-8 quirks from test suite
 
 ## Acknowlegments

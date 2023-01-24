@@ -36,9 +36,10 @@ T random(T range_from, T range_to) {
 
 }  // namespace
 
-Chip8::Chip8(Gfx* const gfx, Input* const input)
+Chip8::Chip8(Gfx* const gfx, Input* const input, Audio* const audio)
     : gfx_{gfx},
       input_{input},
+      audio_{audio},
       ram_{},
       registers_{},
       dt_{0},
@@ -406,6 +407,11 @@ void Chip8::execute_cycle() {
           auto reg_x{(opcode & 0x0F00) >> 8};
           st_ = registers_.at(reg_x);
           pc_ += 2;
+          // Start playing sound.
+          if (st_ > 0) {
+            audio_->play();
+          }
+
           break;
         }
         // ADD I,Vx
@@ -477,6 +483,9 @@ void Chip8::update_timers() {
   }
   if (st_ > 0) {
     --st_;
+  } else {
+    // Stop playing sound.
+    audio_->stop();
   }
 }
 
