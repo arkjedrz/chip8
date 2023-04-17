@@ -1,4 +1,4 @@
-from conans import ConanFile
+from conan import ConanFile
 
 
 class Chip8Conan(ConanFile):
@@ -7,7 +7,7 @@ class Chip8Conan(ConanFile):
     """
     name = "Chip8"
     settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake"
+    generators = "CMakeDeps", "CMakeToolchain"
     options = {
         "testing": [True, False]
     }

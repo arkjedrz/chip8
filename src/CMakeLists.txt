@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Wall -Wextra -pedantic)
 
+find_package(SDL2 REQUIRED)
+find_package(CLI11 REQUIRED)
+
 # Library.
 set(LIB_NAME ${CMAKE_PROJECT_NAME}Core)
 
@@ -25,7 +28,7 @@ target_include_directories(${LIB_NAME}
 )
 
 target_link_libraries(${LIB_NAME}
-    CONAN_PKG::sdl
+    SDL2::SDL2
 )
 
 # Executable. Won't be accessible for testing.
@@ -41,5 +44,5 @@ add_executable(${EXE_NAME}
 
 target_link_libraries(${EXE_NAME}
     ${LIB_NAME}
-    CONAN_PKG::cli11
+    CLI11::CLI11
 )

@@ -9,9 +9,9 @@ Quick start:
 ```bash
 mkdir build && cd build
 conan install .. --build=missing -o testing=True
-cmake -D TESTING=ON ..
+cmake -DTESTING=ON -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release ..
 cmake --build .
-./bin/Chip8
+./src/Chip8
 ```
 
 ## Tested configurations
