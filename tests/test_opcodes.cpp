@@ -3,14 +3,16 @@
 #include "chip8.h"
 #include "sdl.h"
 
+using MockedChip8 = Chip8<EmptyGfx, EmptyInput, EmptyAudio>;
+
 class OpCodeTest : public ::testing::Test {
  public:
-  OpCodeTest() : gfx{}, in{}, audio{}, c{Chip8{&gfx, &in, &audio}} {}
+  OpCodeTest() : gfx{}, in{}, audio{}, c{MockedChip8{gfx, in, audio}} {}
 
   EmptyGfx gfx;
-  MockedInput in;
+  EmptyInput in;
   EmptyAudio audio;
-  Chip8 c;
+  MockedChip8 c;
 };
 
 TEST_F(OpCodeTest, CLS_00E0) {
@@ -59,7 +61,7 @@ TEST_F(OpCodeTest, SEVxNN_3xnn) {
   ASSERT_EQ(c.program_counter(), 0x206);
 
   // PC += 2
-  c = Chip8(&gfx, &in, &audio);
+  c = MockedChip8(gfx, in, audio);
   c.load({0x65, 0xAB, 0x35, 0xFF});
   c.execute_cycle();
   ASSERT_EQ(c.program_counter(), 0x202);
@@ -81,7 +83,7 @@ TEST_F(OpCodeTest, SNEVxNN_4xnn) {
   ASSERT_EQ(c.program_counter(), 0x204);
 
   // PC += 4
-  c = Chip8(&gfx, &in, &audio);
+  c = MockedChip8(gfx, in, audio);
   c.load({0x65, 0xAB, 0x45, 0xFF});
   c.execute_cycle();
   ASSERT_EQ(c.program_counter(), 0x202);
@@ -107,7 +109,7 @@ TEST_F(OpCodeTest, SEVxVy_5xy0) {
   ASSERT_EQ(c.program_counter(), 0x208);
 
   // PC += 2
-  c = Chip8(&gfx, &in, &audio);
+  c = MockedChip8(gfx, in, audio);
   c.load({0x65, 0xAB, 0x67, 0xFF, 0x55, 0x70});
   c.execute_cycle();
   ASSERT_EQ(c.program_counter(), 0x202);
@@ -306,7 +308,7 @@ TEST_F(OpCodeTest, SNEVxVy_9xy0) {
   ASSERT_EQ(c.program_counter(), 0x206);
 
   // PC += 4
-  c = Chip8(&gfx, &in, &audio);
+  c = MockedChip8(gfx, in, audio);
   c.load({0x65, 0xAB, 0x67, 0xFF, 0x95, 0x70});
   c.execute_cycle();
   ASSERT_EQ(c.program_counter(), 0x202);
@@ -363,7 +365,7 @@ TEST_F(OpCodeTest, SKP_Ex9E) {
 
   // Key not pressed.
   in.set_key_state(0xA, false);
-  c = Chip8(&gfx, &in, &audio);
+  c = MockedChip8(gfx, in, audio);
   c.load({0x65, 0x0A, 0xE5, 0x9E});
 
   c.execute_cycle();
@@ -389,7 +391,7 @@ TEST_F(OpCodeTest, SKPN_ExA1) {
 
   // Key not pressed.
   in.set_key_state(0xA, false);
-  c = Chip8(&gfx, &in, &audio);
+  c = MockedChip8(gfx, in, audio);
   c.load({0x65, 0x0A, 0xE5, 0xA1});
 
   c.execute_cycle();

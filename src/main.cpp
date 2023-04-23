@@ -15,10 +15,10 @@ int main(int argc, char** argv) {
 
   auto game{load_game(path_to_game)};
 
-  auto gfx{std::make_unique<SdlGfx>(1024, 512)};
-  auto input{std::make_unique<SdlInput>()};
-  auto audio{std::make_unique<SdlAudio>()};
-  Chip8 chip8{gfx.get(), input.get(), audio.get()};
+  SdlGfx gfx{1024, 512};
+  SdlInput input;
+  SdlAudio audio;
+  Chip8 chip8{gfx, input, audio};
   chip8.load(game);
 
   Timer timer_clock{std::chrono::milliseconds(1000 / 60), [&chip8]() { chip8.update_timers(); }};
@@ -27,5 +27,5 @@ int main(int argc, char** argv) {
   std::mutex exit_mutex;
   std::unique_lock<std::mutex> exit_lock{exit_mutex};
 
-  input->emulator_active_cv().wait(exit_lock, [&input] { return !input->emulator_active(); });
+  input.emulator_active_cv().wait(exit_lock, [&input] { return !input.emulator_active(); });
 }

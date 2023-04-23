@@ -5,35 +5,30 @@
 #include <condition_variable>
 #include <memory>
 
-class Input {
+class EmptyInput {
  public:
-  virtual ~Input() = default;
-
   // Get value. Map of keys.
   // 1 2 3 C
   // 4 5 6 D
   // 7 8 9 E
   // A 0 B F
-  virtual std::array<bool, 16> key_state() = 0;
-};
+  std::array<bool, 16> key_state();
 
-class MockedInput : public Input {
- public:
-  ~MockedInput() = default;
-
-  std::array<bool, 16> key_state() override;
-
+  // Set state of a key.
   void set_key_state(int key, bool state);
 
  private:
   std::array<bool, 16> state_;
 };
 
-class SdlInput : public Input {
+class SdlInput {
  public:
-  ~SdlInput() = default;
-
-  std::array<bool, 16> key_state() override;
+  // Get value. Map of keys.
+  // 1 2 3 C
+  // 4 5 6 D
+  // 7 8 9 E
+  // A 0 B F
+  std::array<bool, 16> key_state();
 
   bool emulator_active() const;
   std::condition_variable& emulator_active_cv();
@@ -43,22 +38,34 @@ class SdlInput : public Input {
   std::condition_variable cv_;
 };
 
+template <typename Impl>
 class Gfx {
  public:
-  Gfx();
-  virtual ~Gfx() = default;
+  Gfx() : map_{} {}
 
   // Set value of a pixel.
-  void set_pixel(int x, int y, bool value);
+  void set_pixel(int x, int y, bool value) {
+    // Prevent out-of-bounds write.
+    auto pos{y * chip8_width + x};
+    if (pos >= chip8_height * chip8_width) {
+      return;
+    }
+    map_.at(pos) = value;
+  }
 
   // Get value of a pixel.
-  bool pixel(int x, int y) const;
+  bool pixel(int x, int y) const {
+    // Prevent out-of-bounds read.
+    auto pos{y * chip8_width + x};
+    if (pos >= chip8_height * chip8_width) {
+      return false;
+    }
+
+    return map_.at(pos);
+  }
 
   // Clear screen.
-  void clear_screen();
-
-  // Render to screen.
-  virtual void render() = 0;
+  void clear_screen() { map_ = {}; }
 
  protected:
   static const int chip8_width{64};
@@ -66,17 +73,19 @@ class Gfx {
   std::array<bool, chip8_width * chip8_height> map_;
 };
 
-class EmptyGfx : public Gfx {
-  void render() override {}
+class EmptyGfx : public Gfx<EmptyGfx> {
+ public:
+  // Do nothing.
+  void render() {}
 };
 
-class SdlGfx : public Gfx {
+class SdlGfx : public Gfx<SdlGfx> {
  public:
   SdlGfx(int window_width, int window_height);
-  ~SdlGfx() override;
+  ~SdlGfx();
 
   // Render to screen.
-  void render() override;
+  void render();
 
  private:
   int width_{};
@@ -85,27 +94,19 @@ class SdlGfx : public Gfx {
   SDL_Surface* surface_{};
 };
 
-class Audio {
+class EmptyAudio {
  public:
-  virtual ~Audio() = default;
-
-  virtual void play() = 0;
-  virtual void stop() = 0;
+  void play() {}
+  void stop() {}
 };
 
-class EmptyAudio : public Audio {
- public:
-  void play() override {}
-  void stop() override {}
-};
-
-class SdlAudio : public Audio {
+class SdlAudio {
  public:
   SdlAudio();
-  ~SdlAudio() override;
+  ~SdlAudio();
 
-  void play() override;
-  void stop() override;
+  void play();
+  void stop();
 
  private:
   SDL_AudioDeviceID device_{};

@@ -13,7 +13,6 @@ find_package(CLI11 REQUIRED)
 set(LIB_NAME ${CMAKE_PROJECT_NAME}Core)
 
 set(LIB_SRC_FILES
-    chip8.cpp
     game.cpp
     sdl.cpp
     timer.cpp

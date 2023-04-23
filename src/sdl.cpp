@@ -6,9 +6,9 @@
 #include <string>
 #include <vector>
 
-std::array<bool, 16> MockedInput::key_state() { return state_; }
+std::array<bool, 16> EmptyInput::key_state() { return state_; }
 
-void MockedInput::set_key_state(int key, bool state) { state_.at(key) = state; }
+void EmptyInput::set_key_state(int key, bool state) { state_.at(key) = state; }
 
 std::array<bool, 16> SdlInput::key_state() {
   SDL_Event e;
@@ -87,32 +87,6 @@ std::array<bool, 16> SdlInput::key_state() {
 bool SdlInput::emulator_active() const { return emulator_active_; }
 
 std::condition_variable& SdlInput::emulator_active_cv() { return cv_; }
-
-Gfx::Gfx() : map_{} {}
-
-// Set value of a pixel.
-void Gfx::set_pixel(int x, int y, bool value) {
-  // Prevent out-of-bounds write.
-  auto pos{y * chip8_width + x};
-  if (pos >= chip8_height * chip8_width) {
-    return;
-  }
-  map_.at(pos) = value;
-}
-
-// Get value of a pixel.
-bool Gfx::pixel(int x, int y) const {
-  // Prevent out-of-bounds read.
-  auto pos{y * chip8_width + x};
-  if (pos >= chip8_height * chip8_width) {
-    return false;
-  }
-
-  return map_.at(pos);
-}
-
-// Clear screen.
-void Gfx::clear_screen() { map_ = {}; }
 
 SdlGfx::SdlGfx(int window_width, int window_height)
     : Gfx{},
